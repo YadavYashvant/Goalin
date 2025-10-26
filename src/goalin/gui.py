@@ -63,83 +63,146 @@ class GoalinWindow(Adw.ApplicationWindow):
         toolbar = Adw.ToolbarView()
         toolbar.add_top_bar(header)
         
-        # Content area
-        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
-        content_box.set_margin_start(20)
-        content_box.set_margin_end(20)
-        content_box.set_margin_top(20)
-        content_box.set_margin_bottom(20)
+        # Content area - use Adwaita Clamp for better centering
+        content_clamp = Adw.Clamp()
+        content_clamp.set_maximum_size(1200)
+        content_clamp.set_tightening_threshold(800)
         
-        # Date label
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
+        content_box.set_margin_start(24)
+        content_box.set_margin_end(24)
+        content_box.set_margin_top(24)
+        content_box.set_margin_bottom(24)
+        
+        # Date label with better styling
+        date_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         self.date_label = Gtk.Label()
         self.date_label.add_css_class("title-1")
-        content_box.append(self.date_label)
+        self.date_label.set_xalign(0)
+        date_box.append(self.date_label)
         
-        # Stats cards
-        self.stats_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        # Subtitle for context
+        self.subtitle_label = Gtk.Label()
+        self.subtitle_label.add_css_class("dim-label")
+        self.subtitle_label.set_xalign(0)
+        date_box.append(self.subtitle_label)
+        
+        content_box.append(date_box)
+        
+        # Stats cards with better spacing
+        self.stats_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
         self.stats_box.set_homogeneous(True)
         content_box.append(self.stats_box)
         
-        # Notebook for tabs
+        # Notebook for tabs with modern styling
         notebook = Gtk.Notebook()
         notebook.set_vexpand(True)
+        notebook.set_margin_top(8)
         
         # Category list tab
-        category_frame = Gtk.Frame()
+        category_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        category_container.set_margin_start(16)
+        category_container.set_margin_end(16)
+        category_container.set_margin_top(16)
+        category_container.set_margin_bottom(16)
         
+        # Category header
+        category_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        category_header.set_margin_bottom(12)
+        
+        category_title = Gtk.Label(label="Time by Category")
+        category_title.add_css_class("title-3")
+        category_title.set_xalign(0)
+        category_title.set_hexpand(True)
+        category_header.append(category_title)
+        
+        category_container.append(category_header)
+        
+        # Category list with better styling
         self.category_list = Gtk.ListBox()
         self.category_list.add_css_class("boxed-list")
+        self.category_list.set_selection_mode(Gtk.SelectionMode.NONE)
         
         scrolled = Gtk.ScrolledWindow()
         scrolled.set_child(self.category_list)
         scrolled.set_vexpand(True)
+        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         
-        category_frame.set_child(scrolled)
-        notebook.append_page(category_frame, Gtk.Label(label="Categories"))
+        category_container.append(scrolled)
+        notebook.append_page(category_container, Gtk.Label(label="📊 Categories"))
         
         # Browser history tab
-        browser_frame = Gtk.Frame()
+        browser_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        browser_container.set_margin_start(16)
+        browser_container.set_margin_end(16)
+        browser_container.set_margin_top(16)
+        browser_container.set_margin_bottom(16)
         
+        # Browser header
+        browser_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        browser_header.set_margin_bottom(12)
+        
+        browser_title = Gtk.Label(label="Firefox Activity")
+        browser_title.add_css_class("title-3")
+        browser_title.set_xalign(0)
+        browser_title.set_hexpand(True)
+        browser_header.append(browser_title)
+        
+        browser_container.append(browser_header)
+        
+        # Browser list with better styling
         self.browser_list = Gtk.ListBox()
         self.browser_list.add_css_class("boxed-list")
+        self.browser_list.set_selection_mode(Gtk.SelectionMode.NONE)
         
         browser_scrolled = Gtk.ScrolledWindow()
         browser_scrolled.set_child(self.browser_list)
         browser_scrolled.set_vexpand(True)
+        browser_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         
-        browser_frame.set_child(browser_scrolled)
-        notebook.append_page(browser_frame, Gtk.Label(label="Firefox Activity"))
+        browser_container.append(browser_scrolled)
+        notebook.append_page(browser_container, Gtk.Label(label="🦊 Firefox"))
         
         content_box.append(notebook)
+        content_clamp.set_child(content_box)
         
-        toolbar.set_content(content_box)
+        toolbar.set_content(content_clamp)
         self.set_content(toolbar)
         
         # Load initial data
         self.update_display()
     
     def create_stat_card(self, title: str, value: str, icon: str = None) -> Gtk.Box:
-        """Create a statistics card"""
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        """Create a statistics card with modern styling"""
+        # Use Adwaita PreferencesGroup for better card styling
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         card.add_css_class("card")
-        card.set_margin_start(6)
-        card.set_margin_end(6)
-        card.set_margin_top(6)
-        card.set_margin_bottom(6)
         
-        inner_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        inner_box.set_margin_start(16)
-        inner_box.set_margin_end(16)
-        inner_box.set_margin_top(16)
-        inner_box.set_margin_bottom(16)
+        inner_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        inner_box.set_margin_start(20)
+        inner_box.set_margin_end(20)
+        inner_box.set_margin_top(20)
+        inner_box.set_margin_bottom(20)
         
-        title_label = Gtk.Label(label=title)
-        title_label.add_css_class("dim-label")
-        inner_box.append(title_label)
+        # Icon if provided
+        if icon:
+            icon_label = Gtk.Label(label=icon)
+            icon_label.add_css_class("title-1")
+            icon_label.set_xalign(0.5)
+            inner_box.append(icon_label)
         
+        # Value with larger, bold text
         value_label = Gtk.Label(label=value)
-        value_label.add_css_class("title-2")
+        value_label.add_css_class("title-1")
+        value_label.set_xalign(0.5)
         inner_box.append(value_label)
+        
+        # Title with dimmed text
+        title_label = Gtk.Label(label=title)
+        title_label.add_css_class("caption")
+        title_label.add_css_class("dim-label")
+        title_label.set_xalign(0.5)
+        inner_box.append(title_label)
         
         card.append(inner_box)
         return card
@@ -160,6 +223,19 @@ class GoalinWindow(Adw.ApplicationWindow):
         date_str = self.current_date.strftime('%A, %B %d, %Y')
         self.date_label.set_text(date_str)
         
+        # Update subtitle
+        today = datetime.now().date()
+        if self.current_date == today:
+            self.subtitle_label.set_text("Today's Activity")
+        elif self.current_date == today - timedelta(days=1):
+            self.subtitle_label.set_text("Yesterday's Activity")
+        else:
+            days_diff = (today - self.current_date).days
+            if days_diff > 0:
+                self.subtitle_label.set_text(f"{days_diff} days ago")
+            else:
+                self.subtitle_label.set_text(f"In {abs(days_diff)} days")
+        
         # Get summary data
         summary = self.db.get_summary_by_date(self.current_date)
         
@@ -167,14 +243,14 @@ class GoalinWindow(Adw.ApplicationWindow):
         while self.stats_box.get_first_child():
             self.stats_box.remove(self.stats_box.get_first_child())
         
-        # Add stat cards
+        # Add stat cards with icons
         active_time = self.format_duration(summary['total_active_time'])
         idle_time = self.format_duration(summary['total_idle_time'])
         most_used = summary['most_used_app']
         
-        self.stats_box.append(self.create_stat_card("Active Time", active_time))
-        self.stats_box.append(self.create_stat_card("Idle Time", idle_time))
-        self.stats_box.append(self.create_stat_card("Most Used App", most_used))
+        self.stats_box.append(self.create_stat_card("Active Time", active_time, "⏱️"))
+        self.stats_box.append(self.create_stat_card("Idle Time", idle_time, "💤"))
+        self.stats_box.append(self.create_stat_card("Most Used", most_used, "⭐"))
         
         # Update category list
         while self.category_list.get_first_child():
@@ -188,32 +264,66 @@ class GoalinWindow(Adw.ApplicationWindow):
         )
         
         total_active = summary['total_active_time']
+        # Category icons
+        category_icons = {
+            'Development': '💻',
+            'Browser': '🌐',
+            'Communication': '💬',
+            'Media': '🎵',
+            'Office': '📄',
+            'Gaming': '🎮',
+            'System': '⚙️',
+            'Idle': '💤',
+            'Other': '📦'
+        }
+        
         for category, duration in sorted_categories:
             row = Gtk.ListBoxRow()
             
-            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-            box.set_margin_start(12)
-            box.set_margin_end(12)
-            box.set_margin_top(8)
-            box.set_margin_bottom(8)
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+            box.set_margin_start(16)
+            box.set_margin_end(16)
+            box.set_margin_top(12)
+            box.set_margin_bottom(12)
             
-            # Category name
-            label = Gtk.Label(label=category)
-            label.set_xalign(0)
-            label.set_hexpand(True)
-            box.append(label)
+            # Category icon
+            icon = category_icons.get(category, '📦')
+            icon_label = Gtk.Label(label=icon)
+            icon_label.set_width_chars(2)
+            box.append(icon_label)
             
-            # Duration
-            duration_label = Gtk.Label(label=self.format_duration(duration))
-            duration_label.add_css_class("dim-label")
-            box.append(duration_label)
+            # Category name and details
+            info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            info_box.set_hexpand(True)
             
-            # Percentage
+            cat_label = Gtk.Label(label=category)
+            cat_label.set_xalign(0)
+            cat_label.add_css_class("heading")
+            info_box.append(cat_label)
+            
+            # Duration and percentage on same line
+            detail_label = Gtk.Label()
+            detail_label.set_xalign(0)
+            detail_label.add_css_class("caption")
+            detail_label.add_css_class("dim-label")
+            
             if total_active > 0:
                 percentage = (duration / total_active) * 100
-                percent_label = Gtk.Label(label=f"{percentage:.1f}%")
-                percent_label.add_css_class("dim-label")
-                box.append(percent_label)
+                detail_label.set_markup(f"{self.format_duration(duration)} <span alpha='60%'>•</span> {percentage:.1f}%")
+            else:
+                detail_label.set_text(self.format_duration(duration))
+            
+            info_box.append(detail_label)
+            box.append(info_box)
+            
+            # Progress indicator (visual bar)
+            if total_active > 0:
+                percentage = (duration / total_active) * 100
+                progress = Gtk.ProgressBar()
+                progress.set_fraction(percentage / 100)
+                progress.set_valign(Gtk.Align.CENTER)
+                progress.set_size_request(80, -1)
+                box.append(progress)
             
             row.set_child(box)
             self.category_list.append(row)
@@ -231,76 +341,115 @@ class GoalinWindow(Adw.ApplicationWindow):
         browser_summary = self.db.get_browser_summary_by_date(self.current_date)
         
         if browser_summary['total_visits'] == 0:
-            # Show empty state
+            # Show empty state with status page
             row = Gtk.ListBoxRow()
-            label = Gtk.Label(label="No Firefox activity recorded for this day")
-            label.add_css_class("dim-label")
-            label.set_margin_top(20)
-            label.set_margin_bottom(20)
-            row.set_child(label)
+            row.set_selectable(False)
+            
+            empty_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+            empty_box.set_margin_top(60)
+            empty_box.set_margin_bottom(60)
+            empty_box.set_margin_start(20)
+            empty_box.set_margin_end(20)
+            
+            # Icon
+            icon_label = Gtk.Label(label="🦊")
+            icon_label.add_css_class("title-1")
+            empty_box.append(icon_label)
+            
+            # Message
+            message_label = Gtk.Label(label="No Firefox Activity")
+            message_label.add_css_class("title-3")
+            empty_box.append(message_label)
+            
+            # Subtitle
+            subtitle = Gtk.Label(label="Browse the web to see your activity here")
+            subtitle.add_css_class("dim-label")
+            empty_box.append(subtitle)
+            
+            row.set_child(empty_box)
             self.browser_list.append(row)
             return
         
         # Add header with total visits
         header_row = Gtk.ListBoxRow()
-        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        header_box.set_margin_start(12)
-        header_box.set_margin_end(12)
+        header_row.set_selectable(False)
+        header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        header_box.set_margin_start(16)
+        header_box.set_margin_end(16)
         header_box.set_margin_top(12)
         header_box.set_margin_bottom(12)
         
-        header_label = Gtk.Label(label=f"Total Firefox Visits: {browser_summary['total_visits']}")
-        header_label.add_css_class("title-4")
+        header_label = Gtk.Label(label=f"{browser_summary['total_visits']} Total Visits")
+        header_label.add_css_class("title-2")
         header_label.set_xalign(0)
         header_box.append(header_label)
+        
+        subheader = Gtk.Label(label="Activity breakdown by category")
+        subheader.add_css_class("caption")
+        subheader.add_css_class("dim-label")
+        subheader.set_xalign(0)
+        header_box.append(subheader)
         
         header_row.set_child(header_box)
         self.browser_list.append(header_row)
         
         # Add category breakdown
+        emoji_map = {
+            'Development': '💻',
+            'Learning': '📚',
+            'Social Media': '📱',
+            'Entertainment': '🎮',
+            'News': '📰',
+            'Shopping': '🛒',
+            'Email': '📧',
+            'Productivity': '📊',
+            'Other': '🌐'
+        }
+        
         for category, count in sorted(browser_summary['categories'].items(), 
                                       key=lambda x: x[1], reverse=True):
             row = Gtk.ListBoxRow()
-            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-            box.set_margin_start(12)
-            box.set_margin_end(12)
-            box.set_margin_top(8)
-            box.set_margin_bottom(8)
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+            box.set_margin_start(16)
+            box.set_margin_end(16)
+            box.set_margin_top(12)
+            box.set_margin_bottom(12)
             
             # Category emoji/icon
-            emoji_map = {
-                'Development': '💻',
-                'Learning': '📚',
-                'Social Media': '📱',
-                'Entertainment': '🎮',
-                'News': '📰',
-                'Shopping': '🛒',
-                'Email': '📧',
-                'Productivity': '📊',
-                'Other': '🌐'
-            }
             emoji = emoji_map.get(category, '🌐')
-            
             emoji_label = Gtk.Label(label=emoji)
+            emoji_label.set_width_chars(2)
             box.append(emoji_label)
             
-            # Category name
-            label = Gtk.Label(label=category)
-            label.set_xalign(0)
-            label.set_hexpand(True)
-            box.append(label)
+            # Category info
+            info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            info_box.set_hexpand(True)
             
-            # Visit count
-            count_label = Gtk.Label(label=f"{count} visits")
-            count_label.add_css_class("dim-label")
-            box.append(count_label)
+            cat_label = Gtk.Label(label=category)
+            cat_label.set_xalign(0)
+            cat_label.add_css_class("heading")
+            info_box.append(cat_label)
             
-            # Percentage
+            # Visit count and percentage
             if browser_summary['total_visits'] > 0:
                 percentage = (count / browser_summary['total_visits']) * 100
-                percent_label = Gtk.Label(label=f"{percentage:.1f}%")
-                percent_label.add_css_class("dim-label")
-                box.append(percent_label)
+                detail_label = Gtk.Label()
+                detail_label.set_xalign(0)
+                detail_label.add_css_class("caption")
+                detail_label.add_css_class("dim-label")
+                detail_label.set_markup(f"{count} visits <span alpha='60%'>•</span> {percentage:.1f}%")
+                info_box.append(detail_label)
+            
+            box.append(info_box)
+            
+            # Progress bar
+            if browser_summary['total_visits'] > 0:
+                percentage = (count / browser_summary['total_visits']) * 100
+                progress = Gtk.ProgressBar()
+                progress.set_fraction(percentage / 100)
+                progress.set_valign(Gtk.Align.CENTER)
+                progress.set_size_request(80, -1)
+                box.append(progress)
             
             row.set_child(box)
             self.browser_list.append(row)
@@ -309,46 +458,70 @@ class GoalinWindow(Adw.ApplicationWindow):
         separator_row = Gtk.ListBoxRow()
         separator_row.set_selectable(False)
         separator = Gtk.Separator()
-        separator.set_margin_top(8)
-        separator.set_margin_bottom(8)
+        separator.set_margin_top(16)
+        separator.set_margin_bottom(16)
         separator_row.set_child(separator)
         self.browser_list.append(separator_row)
         
-        # Add top domains
+        # Add top domains header
         domain_header = Gtk.ListBoxRow()
+        domain_header.set_selectable(False)
+        domain_header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        domain_header_box.set_margin_start(16)
+        domain_header_box.set_margin_end(16)
+        domain_header_box.set_margin_top(8)
+        domain_header_box.set_margin_bottom(8)
+        
         domain_header_label = Gtk.Label(label="Top Websites")
-        domain_header_label.add_css_class("title-4")
+        domain_header_label.add_css_class("title-3")
         domain_header_label.set_xalign(0)
-        domain_header_label.set_margin_start(12)
-        domain_header_label.set_margin_top(8)
-        domain_header.set_child(domain_header_label)
+        domain_header_box.append(domain_header_label)
+        
+        domain_subheader = Gtk.Label(label="Most visited domains")
+        domain_subheader.add_css_class("caption")
+        domain_subheader.add_css_class("dim-label")
+        domain_subheader.set_xalign(0)
+        domain_header_box.append(domain_subheader)
+        
+        domain_header.set_child(domain_header_box)
         self.browser_list.append(domain_header)
         
-        for domain_data in browser_summary['domains'][:10]:
+        for idx, domain_data in enumerate(browser_summary['domains'][:10], 1):
             row = Gtk.ListBoxRow()
-            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-            box.set_margin_start(12)
-            box.set_margin_end(12)
-            box.set_margin_top(6)
-            box.set_margin_bottom(6)
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+            box.set_margin_start(16)
+            box.set_margin_end(16)
+            box.set_margin_top(10)
+            box.set_margin_bottom(10)
+            
+            # Rank number
+            rank_label = Gtk.Label(label=f"#{idx}")
+            rank_label.add_css_class("monospace")
+            rank_label.add_css_class("dim-label")
+            rank_label.set_width_chars(3)
+            rank_label.set_xalign(1)
+            box.append(rank_label)
+            
+            # Domain info
+            info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            info_box.set_hexpand(True)
             
             # Domain name
             domain_label = Gtk.Label(label=domain_data['domain'])
             domain_label.set_xalign(0)
-            domain_label.add_css_class("title-5")
-            box.append(domain_label)
+            domain_label.add_css_class("heading")
+            domain_label.set_ellipsize(3)  # ELLIPSIZE_END
+            info_box.append(domain_label)
             
             # Category and visits
-            info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+            detail_label = Gtk.Label()
+            detail_label.set_xalign(0)
+            detail_label.add_css_class("caption")
+            detail_label.add_css_class("dim-label")
             
-            cat_label = Gtk.Label(label=domain_data['category'])
-            cat_label.add_css_class("dim-label")
-            cat_label.set_xalign(0)
-            info_box.append(cat_label)
-            
-            visits_label = Gtk.Label(label=f"• {domain_data['visits']} visits")
-            visits_label.add_css_class("dim-label")
-            info_box.append(visits_label)
+            emoji = emoji_map.get(domain_data['category'], '🌐')
+            detail_label.set_markup(f"{emoji} {domain_data['category']} <span alpha='60%'>•</span> {domain_data['visits']} visits")
+            info_box.append(detail_label)
             
             box.append(info_box)
             row.set_child(box)

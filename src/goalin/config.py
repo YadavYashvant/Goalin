@@ -46,7 +46,7 @@ APP_CATEGORIES = {
         'pdf', 'document'
     ],
     'Gaming': [
-        'steam', 'game', 'minecraft', 'lutris', 'playonlinux'
+        'steam', 'game', 'minecraft', 'lutris', 'playonlinux', 'wine'
     ],
     'System': [
         'settings', 'systemsettings', 'nautilus', 'dolphin', 'thunar',
