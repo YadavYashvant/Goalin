@@ -41,7 +41,7 @@ fi
 
 echo ""
 echo "📦 Installing Goalin..."
-pip3 install --user .
+pip3 install --user --break-system-packages .
 
 echo ""
 echo "⚙️  Setting up systemd service..."

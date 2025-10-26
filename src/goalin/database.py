@@ -67,6 +67,31 @@ class ActivityDatabase:
             )
         ''')
         
+        # Browser history table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS browser_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                url TEXT,
+                title TEXT,
+                domain TEXT,
+                category TEXT,
+                profile TEXT
+            )
+        ''')
+        
+        # Browser summary table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS browser_summary (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date DATE,
+                domain TEXT,
+                category TEXT,
+                visit_count INTEGER,
+                UNIQUE(date, domain)
+            )
+        ''')
+        
         self.conn.commit()
         logger.info(f"Database initialized at {self.db_path}")
     
@@ -264,3 +289,78 @@ class ActivityDatabase:
         if self.conn:
             self.conn.close()
             logger.info("Database connection closed")
+    
+    def log_browser_history(self, history_entries: List[Dict]):
+        """
+        Log browser history entries
+        
+        Args:
+            history_entries: List of history entries from browser tracker
+        """
+        cursor = self.conn.cursor()
+        for entry in history_entries:
+            cursor.execute('''
+                INSERT INTO browser_history (timestamp, url, title, domain, category, profile)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (entry['timestamp'], entry['url'], entry['title'], 
+                  entry['domain'], entry['category'], entry.get('profile', '')))
+        self.conn.commit()
+    
+    def get_browser_history_by_date(self, date: datetime.date) -> List[sqlite3.Row]:
+        """Get browser history for a specific date"""
+        cursor = self.conn.cursor()
+        cursor.execute('''
+            SELECT * FROM browser_history
+            WHERE DATE(timestamp) = ?
+            ORDER BY timestamp DESC
+        ''', (date,))
+        return cursor.fetchall()
+    
+    def get_browser_summary_by_date(self, date: datetime.date) -> Dict:
+        """Get browser activity summary for a date"""
+        cursor = self.conn.cursor()
+        
+        # Get visit counts by domain
+        cursor.execute('''
+            SELECT domain, category, COUNT(*) as visit_count
+            FROM browser_history
+            WHERE DATE(timestamp) = ?
+            GROUP BY domain, category
+            ORDER BY visit_count DESC
+        ''', (date,))
+        
+        domains = []
+        categories = {}
+        
+        for row in cursor.fetchall():
+            domains.append({
+                'domain': row['domain'],
+                'category': row['category'],
+                'visits': row['visit_count']
+            })
+            cat = row['category']
+            categories[cat] = categories.get(cat, 0) + row['visit_count']
+        
+        # Get total visits
+        cursor.execute('''
+            SELECT COUNT(*) as total FROM browser_history
+            WHERE DATE(timestamp) = ?
+        ''', (date,))
+        total_visits = cursor.fetchone()['total']
+        
+        return {
+            'date': date,
+            'total_visits': total_visits,
+            'domains': domains,
+            'categories': categories
+        }
+    
+    def save_browser_summary(self, date: datetime.date, summary: Dict):
+        """Save browser summary to database"""
+        cursor = self.conn.cursor()
+        for domain_data in summary.get('domains', []):
+            cursor.execute('''
+                INSERT OR REPLACE INTO browser_summary (date, domain, category, visit_count)
+                VALUES (?, ?, ?, ?)
+            ''', (date, domain_data['domain'], domain_data['category'], domain_data['visits']))
+        self.conn.commit()

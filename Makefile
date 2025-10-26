@@ -17,14 +17,14 @@ help:
 	@echo "format           - Format code with black"
 
 install:
-	pip install --user .
+	pip install --user --break-system-packages .
 	@echo ""
 	@echo "Installation complete!"
 	@echo "Run 'make service-install' to set up the daemon"
 
 install-dev:
-	pip install --user -e .
-	pip install --user pytest pylint black
+	pip install --user --break-system-packages -e .
+	pip install --user --break-system-packages pytest pylint black
 	@echo ""
 	@echo "Development installation complete!"
 

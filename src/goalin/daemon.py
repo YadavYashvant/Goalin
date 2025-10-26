@@ -14,6 +14,7 @@ from goalin.config import POLL_INTERVAL, IDLE_THRESHOLD, REPORT_TIME, get_catego
 from goalin.database import ActivityDatabase
 from goalin.tracker import ActivityTracker
 from goalin.report import ReportGenerator
+from goalin.browser_history import BrowserHistoryTracker
 
 # Setup logging
 LOG_DIR = Path.home() / '.local' / 'share' / 'goalin' / 'logs'
@@ -38,8 +39,10 @@ class GoalinDaemon:
         self.running = True
         self.db = ActivityDatabase()
         self.tracker = ActivityTracker()
+        self.browser_tracker = BrowserHistoryTracker()
         self.report_generator = ReportGenerator(self.db)
         self.last_report_date = None
+        self.last_browser_sync = None
         
         # Setup signal handlers
         signal.signal(signal.SIGTERM, self._signal_handler)
@@ -122,6 +125,34 @@ class GoalinDaemon:
         except Exception as e:
             logger.error(f"Error generating report: {e}", exc_info=True)
     
+    def sync_browser_history(self):
+        """Sync browser history to database"""
+        try:
+            now = datetime.now()
+            
+            # Sync every 5 minutes
+            if self.last_browser_sync is None or \
+               (now - self.last_browser_sync).total_seconds() >= 300:
+                
+                logger.debug("Syncing browser history...")
+                
+                # Get history since last sync (or last hour if first sync)
+                if self.last_browser_sync:
+                    start_time = self.last_browser_sync
+                else:
+                    start_time = now - __import__('datetime').timedelta(hours=1)
+                
+                history = self.browser_tracker.get_history_for_period(start_time, now)
+                
+                if history:
+                    self.db.log_browser_history(history)
+                    logger.info(f"Synced {len(history)} browser history entries")
+                
+                self.last_browser_sync = now
+                
+        except Exception as e:
+            logger.error(f"Error syncing browser history: {e}", exc_info=True)
+    
     def run(self):
         """Main daemon loop"""
         logger.info("Starting Goalin daemon...")
@@ -130,6 +161,9 @@ class GoalinDaemon:
             try:
                 # Track current activity
                 self.track_activity()
+                
+                # Sync browser history
+                self.sync_browser_history()
                 
                 # Check if we should generate a daily report
                 if self._should_generate_report():
