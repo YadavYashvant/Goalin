@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Goalin
+Comment=Productivity tracking and analysis
+Exec=goalin-gui
+Icon=org.gnome.Calendar
+Categories=Utility;GTK;
+Keywords=productivity;tracker;activity;time;
+Terminal=false
+StartupNotify=true

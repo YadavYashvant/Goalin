@@ -1,0 +1,12 @@
+[Unit]
+Description=Goalin Activity Tracking Daemon
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/goalin-daemon
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
