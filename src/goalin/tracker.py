@@ -81,8 +81,25 @@ class ActivityTracker:
         Returns:
             Tuple of (window_title, application_name)
         """
+        # Try Hyprland
+        if os.environ.get('HYPRLAND_INSTANCE_SIGNATURE'):
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ['hyprctl', 'activewindow', '-j'],
+                    capture_output=True, text=True, timeout=1
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    import json
+                    window = json.loads(result.stdout)
+                    title = window.get('title', 'Unknown')
+                    app_class = window.get('class', 'Unknown')
+                    return title, app_class
+            except Exception as e:
+                logger.debug(f"Error getting Hyprland window info: {e}")
+        
+        # Try using playerctl for media applications
         try:
-            # Try using playerctl for media applications
             import subprocess
             result = subprocess.run(
                 ['playerctl', 'metadata', '--format', '{{playerName}}: {{title}}'],
@@ -173,9 +190,25 @@ class ActivityTracker:
         Returns:
             Idle time in seconds
         """
+        # Try Hyprland
+        if os.environ.get('HYPRLAND_INSTANCE_SIGNATURE'):
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ['hyprctl', 'idle', '-j'],
+                    capture_output=True, text=True, timeout=1
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    import json
+                    idle_info = json.loads(result.stdout)
+                    # Hyprland returns idle time in milliseconds
+                    return idle_info.get('idleTime', 0) // 1000
+            except Exception:
+                pass
+        
+        # Try using swayidle if available
         try:
             import subprocess
-            # Try using swayidle if available
             result = subprocess.run(
                 ['pidof', 'swayidle'],
                 capture_output=True, timeout=1

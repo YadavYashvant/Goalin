@@ -2,9 +2,10 @@
 Type=Application
 Name=Goalin
 Comment=Productivity tracking and analysis
-Exec=goalin-gui
+Exec=sh -c 'if [ -x "$HOME/.local/bin/goalin-gui" ]; then "$HOME/.local/bin/goalin-gui"; else /usr/bin/goalin-gui; fi'
 Icon=org.gnome.Calendar
-Categories=Utility;GTK;
-Keywords=productivity;tracker;activity;time;
+Categories=Utility;GTK;Office;
+Keywords=productivity;tracker;activity;time;statistics;
 Terminal=false
 StartupNotify=true
+StartupWMClass=goalin

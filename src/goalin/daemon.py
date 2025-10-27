@@ -103,9 +103,9 @@ class GoalinDaemon:
                         is_idle=False
                     )
                     
-                    logger.debug(f"Tracked: {app_name} - {window_title[:50]}")
+                    logger.info(f"Tracked: {app_name} - {window_title[:50]}")
                 else:
-                    logger.debug("Could not detect active window")
+                    logger.warning("Could not detect active window")
                     
         except Exception as e:
             logger.error(f"Error tracking activity: {e}", exc_info=True)

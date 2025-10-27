@@ -1,12 +1,16 @@
 [Unit]
 Description=Goalin Activity Tracking Daemon
-After=graphical.target
+After=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=%h/.local/bin/goalin-daemon
 Restart=on-failure
 RestartSec=10
+Environment="DISPLAY=:0"
+Environment="WAYLAND_DISPLAY=wayland-1"
+Environment="XDG_SESSION_TYPE=wayland"
+Environment="HYPRLAND_INSTANCE_SIGNATURE=%E{HYPRLAND_INSTANCE_SIGNATURE}"
 
 [Install]
 WantedBy=default.target
