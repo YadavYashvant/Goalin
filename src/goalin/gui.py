@@ -413,7 +413,8 @@ class GoalinWindow(Adw.ApplicationWindow):
         
         for activity in activities:
             # Parse timestamp (stored as UTC in database)
-            timestamp_str = activity[3]  # timestamp column
+            # Column order: id(0), timestamp(1), window_title(2), application(3), category(4), duration(5), is_idle(6)
+            timestamp_str = activity[1]  # timestamp column
             try:
                 # Handle both formats: with and without microseconds
                 if '.' in timestamp_str:
@@ -429,9 +430,9 @@ class GoalinWindow(Adw.ApplicationWindow):
                 
                 hour = dt_local.hour
                 hourly_activities[hour].append({
-                    'app': activity[1],  # application column
+                    'app': activity[3],  # application column
                     'window': activity[2],  # window_title column
-                    'duration': activity[4],  # duration column
+                    'duration': activity[5],  # duration column
                     'time': dt_local
                 })
             except Exception as e:

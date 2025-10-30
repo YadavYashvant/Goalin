@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Timeline View**: New interactive timeline tab showing hourly activity breakdown
+  - Activities grouped by hour with visual progress bars
+  - Top 3 applications per hour with duration and percentage
+  - Recent window titles for context
+  - Time range indicators (HH:00 - HH:59)
+  - Empty state with helpful messages
+
 ### Planned
 - Weekly and monthly report views
 - Productivity goals and targets
