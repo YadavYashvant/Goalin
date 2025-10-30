@@ -11,6 +11,8 @@ import sys
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+from collections import defaultdict
+from pytz import timezone, utc
 
 from goalin.database import ActivityDatabase
 from goalin.config import ensure_directories
@@ -98,6 +100,38 @@ class GoalinWindow(Adw.ApplicationWindow):
         notebook = Gtk.Notebook()
         notebook.set_vexpand(True)
         notebook.set_margin_top(8)
+        
+        # Timeline tab (new)
+        timeline_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        timeline_container.set_margin_start(16)
+        timeline_container.set_margin_end(16)
+        timeline_container.set_margin_top(16)
+        timeline_container.set_margin_bottom(16)
+        
+        # Timeline header
+        timeline_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        timeline_header.set_margin_bottom(12)
+        
+        timeline_title = Gtk.Label(label="Activity Timeline")
+        timeline_title.add_css_class("title-3")
+        timeline_title.set_xalign(0)
+        timeline_title.set_hexpand(True)
+        timeline_header.append(timeline_title)
+        
+        timeline_container.append(timeline_header)
+        
+        # Timeline list with better styling
+        self.timeline_list = Gtk.ListBox()
+        self.timeline_list.add_css_class("boxed-list")
+        self.timeline_list.set_selection_mode(Gtk.SelectionMode.NONE)
+        
+        timeline_scrolled = Gtk.ScrolledWindow()
+        timeline_scrolled.set_child(self.timeline_list)
+        timeline_scrolled.set_vexpand(True)
+        timeline_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        
+        timeline_container.append(timeline_scrolled)
+        notebook.append_page(timeline_container, Gtk.Label(label="⏰ Timeline"))
         
         # Category list tab
         category_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -263,6 +297,9 @@ class GoalinWindow(Adw.ApplicationWindow):
             reverse=True
         )
         
+        # Update timeline display
+        self.update_timeline_display()
+        
         total_active = summary['total_active_time']
         # Category icons
         category_icons = {
@@ -330,6 +367,241 @@ class GoalinWindow(Adw.ApplicationWindow):
         
         # Update browser history list
         self.update_browser_display()
+    
+    def update_timeline_display(self):
+        """Update the timeline display with hourly activity blocks"""
+        # Clear timeline list
+        while self.timeline_list.get_first_child():
+            self.timeline_list.remove(self.timeline_list.get_first_child())
+        
+        # Get activities for the current date
+        activities = self.db.get_activities_by_date(self.current_date)
+        
+        if not activities:
+            # Show empty state
+            row = Gtk.ListBoxRow()
+            row.set_selectable(False)
+            
+            empty_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+            empty_box.set_margin_top(60)
+            empty_box.set_margin_bottom(60)
+            empty_box.set_margin_start(20)
+            empty_box.set_margin_end(20)
+            
+            # Icon
+            icon_label = Gtk.Label(label="⏰")
+            icon_label.add_css_class("title-1")
+            empty_box.append(icon_label)
+            
+            # Message
+            message_label = Gtk.Label(label="No Activity Recorded")
+            message_label.add_css_class("title-3")
+            empty_box.append(message_label)
+            
+            # Subtitle
+            subtitle = Gtk.Label(label="Start using your computer to see your timeline")
+            subtitle.add_css_class("dim-label")
+            empty_box.append(subtitle)
+            
+            row.set_child(empty_box)
+            self.timeline_list.append(row)
+            return
+        
+        # Group activities by hour
+        from collections import defaultdict
+        hourly_activities = defaultdict(list)
+        
+        for activity in activities:
+            # Parse timestamp (stored as UTC in database)
+            timestamp_str = activity[3]  # timestamp column
+            try:
+                # Handle both formats: with and without microseconds
+                if '.' in timestamp_str:
+                    dt = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S.%f')
+                else:
+                    dt = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
+                
+                # Convert to local time
+                from pytz import timezone, utc
+                local_tz = timezone('Asia/Kolkata')  # You can make this configurable
+                dt_utc = utc.localize(dt)
+                dt_local = dt_utc.astimezone(local_tz)
+                
+                hour = dt_local.hour
+                hourly_activities[hour].append({
+                    'app': activity[1],  # application column
+                    'window': activity[2],  # window_title column
+                    'duration': activity[4],  # duration column
+                    'time': dt_local
+                })
+            except Exception as e:
+                logger.warning(f"Error parsing timestamp: {timestamp_str}, {e}")
+                continue
+        
+        # Add header with date range info
+        if hourly_activities:
+            hours = sorted(hourly_activities.keys())
+            start_hour = hours[0]
+            end_hour = hours[-1]
+            
+            header_row = Gtk.ListBoxRow()
+            header_row.set_selectable(False)
+            header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            header_box.set_margin_start(16)
+            header_box.set_margin_end(16)
+            header_box.set_margin_top(12)
+            header_box.set_margin_bottom(12)
+            
+            header_label = Gtk.Label(label=f"Activity from {start_hour:02d}:00 to {end_hour:02d}:59")
+            header_label.add_css_class("title-2")
+            header_label.set_xalign(0)
+            header_box.append(header_label)
+            
+            subheader = Gtk.Label(label="Your activity grouped by hour")
+            subheader.add_css_class("caption")
+            subheader.add_css_class("dim-label")
+            subheader.set_xalign(0)
+            header_box.append(subheader)
+            
+            header_row.set_child(header_box)
+            self.timeline_list.append(header_row)
+        
+        # Create timeline blocks for each hour
+        app_icons = {
+            'firefox': '🦊',
+            'chrome': '🌐',
+            'chromium': '🌐',
+            'code': '💻',
+            'sublime': '💻',
+            'vim': '💻',
+            'terminal': '⚡',
+            'konsole': '⚡',
+            'alacritty': '⚡',
+            'spotify': '🎵',
+            'discord': '💬',
+            'slack': '💬',
+            'telegram': '💬',
+            'libreoffice': '📄',
+            'gimp': '🎨',
+            'vlc': '🎬',
+        }
+        
+        for hour in sorted(hourly_activities.keys()):
+            activities_in_hour = hourly_activities[hour]
+            
+            # Count activities by application
+            app_counts = defaultdict(int)
+            app_durations = defaultdict(int)
+            for act in activities_in_hour:
+                app = act['app'].lower()
+                app_counts[app] += 1
+                app_durations[app] += act['duration']
+            
+            # Get top app for this hour
+            top_app = max(app_durations.items(), key=lambda x: x[1])
+            total_duration = sum(app_durations.values())
+            
+            row = Gtk.ListBoxRow()
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            box.set_margin_start(16)
+            box.set_margin_end(16)
+            box.set_margin_top(12)
+            box.set_margin_bottom(12)
+            
+            # Hour header with time range
+            hour_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+            
+            # Time range
+            time_label = Gtk.Label(label=f"{hour:02d}:00 - {hour:02d}:59")
+            time_label.add_css_class("title-3")
+            time_label.set_width_chars(15)
+            time_label.set_xalign(0)
+            hour_header.append(time_label)
+            
+            # Duration badge
+            duration_badge = Gtk.Label(label=self.format_duration(total_duration))
+            duration_badge.add_css_class("caption")
+            duration_badge.add_css_class("dim-label")
+            duration_badge.set_xalign(0)
+            hour_header.append(duration_badge)
+            
+            # Activity count
+            activity_count = Gtk.Label(label=f"{len(activities_in_hour)} activities")
+            activity_count.add_css_class("caption")
+            activity_count.add_css_class("dim-label")
+            activity_count.set_hexpand(True)
+            activity_count.set_xalign(1)
+            hour_header.append(activity_count)
+            
+            box.append(hour_header)
+            
+            # Show top 3 applications in this hour
+            sorted_apps = sorted(app_durations.items(), key=lambda x: x[1], reverse=True)[:3]
+            
+            for app, duration in sorted_apps:
+                app_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+                app_box.set_margin_start(20)
+                
+                # App icon
+                icon = app_icons.get(app, '📦')
+                icon_label = Gtk.Label(label=icon)
+                icon_label.set_width_chars(2)
+                app_box.append(icon_label)
+                
+                # App info
+                info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+                info_box.set_hexpand(True)
+                
+                # App name
+                app_label = Gtk.Label(label=app.title())
+                app_label.set_xalign(0)
+                app_label.add_css_class("heading")
+                info_box.append(app_label)
+                
+                # Get most recent window title for this app in this hour
+                app_activities = [a for a in activities_in_hour if a['app'].lower() == app]
+                if app_activities:
+                    latest_window = app_activities[0]['window']  # Already sorted by time DESC
+                    if latest_window and latest_window != 'Unknown':
+                        window_label = Gtk.Label(label=latest_window[:60])
+                        window_label.set_xalign(0)
+                        window_label.add_css_class("caption")
+                        window_label.add_css_class("dim-label")
+                        window_label.set_ellipsize(3)  # ELLIPSIZE_END
+                        info_box.append(window_label)
+                
+                app_box.append(info_box)
+                
+                # Duration and percentage
+                percentage = (duration / total_duration) * 100
+                
+                stats_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+                stats_box.set_valign(Gtk.Align.CENTER)
+                
+                duration_label = Gtk.Label(label=self.format_duration(duration))
+                duration_label.add_css_class("heading")
+                duration_label.set_xalign(1)
+                stats_box.append(duration_label)
+                
+                percent_label = Gtk.Label(label=f"{percentage:.0f}%")
+                percent_label.add_css_class("caption")
+                percent_label.add_css_class("dim-label")
+                percent_label.set_xalign(1)
+                stats_box.append(percent_label)
+                
+                app_box.append(stats_box)
+                
+                # Progress bar
+                progress = Gtk.ProgressBar()
+                progress.set_fraction(percentage / 100)
+                progress.set_valign(Gtk.Align.CENTER)
+                progress.set_size_request(60, -1)
+                app_box.append(progress)
+                
+                box.append(app_box)
+            
+            row.set_child(box)
+            self.timeline_list.append(row)
     
     def update_browser_display(self):
         """Update the browser history display"""
