@@ -991,63 +991,169 @@ class GoalinWindow(Adw.ApplicationWindow):
         while child := self.productivity_box.get_first_child():
             self.productivity_box.remove(child)
         
-        # Calculate productivity metrics
+        # Calculate productivity metrics with AI
         total_time = summary['total_active_time']
         if total_time > 0:
-            dev_time = summary['categories'].get('Development', 0)
-            browser_time = summary['categories'].get('Browser', 0)
-            comm_time = summary['categories'].get('Communication', 0)
+            # Try to get AI-powered analysis
+            ai_insights = None
+            try:
+                from goalin.ai_assistant import AIAssistant
+                ai = AIAssistant()
+                if ai.is_configured():
+                    # Get activity data for AI analysis
+                    activities = self.db.get_activities_by_date(self.current_date)
+                    from collections import defaultdict
+                    hourly_data = defaultdict(int)
+                    app_durations = defaultdict(int)
+                    
+                    for activity in activities:
+                        try:
+                            hour = datetime.strptime(activity[1], '%Y-%m-%d %H:%M:%S.%f').hour if '.' in activity[1] else datetime.strptime(activity[1], '%Y-%m-%d %H:%M:%S').hour
+                            app = activity[3]
+                            duration = activity[5]
+                            hourly_data[hour] += duration
+                            app_durations[app] += duration
+                        except:
+                            continue
+                    
+                    day_data = {
+                        'total_active_time': total_time,
+                        'categories': summary['categories'],
+                        'apps': dict(app_durations),
+                        'hourly_pattern': dict(hourly_data)
+                    }
+                    ai_insights = ai.analyze_productivity(day_data)
+            except Exception as e:
+                logger.warning(f"AI analysis not available: {e}")
             
-            prod_ratio = dev_time / total_time
+            # Use AI score if available, otherwise calculate basic score
+            if ai_insights and 'productivity_score' in ai_insights:
+                prod_score = ai_insights['productivity_score']
+                prod_level = ai_insights.get('productivity_level', 'Medium')
+            else:
+                dev_time = summary['categories'].get('Development', 0)
+                office_time = summary['categories'].get('Office', 0)
+                prod_time = summary['categories'].get('Productivity', 0)
+                total_productive = dev_time + office_time + prod_time
+                prod_score = (total_productive / total_time * 100) if total_time > 0 else 0
+                prod_level = 'High' if prod_score >= 80 else 'Medium' if prod_score >= 50 else 'Low'
             
-            # Productivity score
+            # Productivity score header
             score_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
             score_box.set_margin_bottom(16)
             
-            score_label = Gtk.Label(label="Productivity Score")
-            score_label.add_css_class("title-3")
-            score_label.set_hexpand(True)
-            score_label.set_xalign(0)
-            score_box.append(score_label)
+            score_label_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            score_label_box.set_hexpand(True)
             
-            score_value = Gtk.Label(label=f"{prod_ratio*100:.0f}%")
+            score_label = Gtk.Label(label="🤖 AI Productivity Score" if ai_insights else "Productivity Score")
+            score_label.add_css_class("title-3")
+            score_label.set_xalign(0)
+            score_label_box.append(score_label)
+            
+            level_label = Gtk.Label(label=f"Level: {prod_level}")
+            level_label.set_xalign(0)
+            level_label.add_css_class("caption")
+            level_label.add_css_class("dim-label")
+            score_label_box.append(level_label)
+            
+            score_box.append(score_label_box)
+            
+            score_value = Gtk.Label(label=f"{prod_score:.0f}%")
             score_value.add_css_class("title-1")
             score_box.append(score_value)
             
             self.productivity_box.append(score_box)
             
-            # Progress bar
+            # Progress bar with color based on level
             progress = Gtk.ProgressBar()
-            progress.set_fraction(prod_ratio)
+            progress.set_fraction(prod_score / 100)
             progress.set_margin_bottom(16)
             self.productivity_box.append(progress)
             
-            # Breakdown
-            breakdown = [
-                ("Development Time", dev_time, "💻"),
-                ("Browser Time", browser_time, "🌐"),
-                ("Communication Time", comm_time, "💬"),
-            ]
-            
-            for label, time, icon in breakdown:
-                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-                row.add_css_class("app-item")
+            # AI Insights section
+            if ai_insights:
+                # Insights
+                insights_header = Gtk.Label(label="💡 Key Insights")
+                insights_header.add_css_class("title-4")
+                insights_header.set_xalign(0)
+                insights_header.set_margin_top(12)
+                insights_header.set_margin_bottom(8)
+                self.productivity_box.append(insights_header)
                 
-                icon_label = Gtk.Label(label=icon)
-                icon_label.set_width_chars(3)
-                row.append(icon_label)
+                for insight in ai_insights.get('insights', [])[:3]:
+                    insight_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+                    insight_row.add_css_class("app-item")
+                    insight_row.set_margin_bottom(4)
+                    
+                    bullet = Gtk.Label(label="•")
+                    bullet.set_width_chars(2)
+                    bullet.add_css_class("dim-label")
+                    insight_row.append(bullet)
+                    
+                    insight_label = Gtk.Label(label=insight)
+                    insight_label.set_wrap(True)
+                    insight_label.set_xalign(0)
+                    insight_label.set_hexpand(True)
+                    insight_row.append(insight_label)
+                    
+                    self.productivity_box.append(insight_row)
                 
-                name_label = Gtk.Label(label=label)
-                name_label.set_xalign(0)
-                name_label.set_hexpand(True)
-                name_label.add_css_class("heading")
-                row.append(name_label)
+                # Recommendations
+                recs_header = Gtk.Label(label="🚀 Recommendations")
+                recs_header.add_css_class("title-4")
+                recs_header.set_xalign(0)
+                recs_header.set_margin_top(16)
+                recs_header.set_margin_bottom(8)
+                self.productivity_box.append(recs_header)
                 
-                time_label = Gtk.Label(label=self.format_duration(time))
-                time_label.add_css_class("time-badge")
-                row.append(time_label)
+                for rec in ai_insights.get('recommendations', [])[:3]:
+                    rec_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+                    rec_row.add_css_class("app-item")
+                    rec_row.set_margin_bottom(4)
+                    
+                    arrow = Gtk.Label(label="→")
+                    arrow.set_width_chars(2)
+                    arrow.add_css_class("dim-label")
+                    rec_row.append(arrow)
+                    
+                    rec_label = Gtk.Label(label=rec)
+                    rec_label.set_wrap(True)
+                    rec_label.set_xalign(0)
+                    rec_label.set_hexpand(True)
+                    rec_row.append(rec_label)
+                    
+                    self.productivity_box.append(rec_row)
+            else:
+                # Basic breakdown without AI
+                dev_time = summary['categories'].get('Development', 0)
+                browser_time = summary['categories'].get('Browser', 0)
+                comm_time = summary['categories'].get('Communication', 0)
                 
-                self.productivity_box.append(row)
+                breakdown = [
+                    ("Development Time", dev_time, "💻"),
+                    ("Browser Time", browser_time, "🌐"),
+                    ("Communication Time", comm_time, "💬"),
+                ]
+                
+                for label, time, icon in breakdown:
+                    row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+                    row.add_css_class("app-item")
+                    
+                    icon_label = Gtk.Label(label=icon)
+                    icon_label.set_width_chars(3)
+                    row.append(icon_label)
+                    
+                    name_label = Gtk.Label(label=label)
+                    name_label.set_xalign(0)
+                    name_label.set_hexpand(True)
+                    name_label.add_css_class("heading")
+                    row.append(name_label)
+                    
+                    time_label = Gtk.Label(label=self.format_duration(time))
+                    time_label.add_css_class("time-badge")
+                    row.append(time_label)
+                    
+                    self.productivity_box.append(row)
         else:
             empty = self.create_empty_state("📈", "No Data", "Start working to see productivity insights")
             self.productivity_box.append(empty)
