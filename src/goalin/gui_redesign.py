@@ -199,7 +199,7 @@ class GoalinWindow(Adw.ApplicationWindow):
                 background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%);
                 border-radius: 12px;
                 padding: 20px;
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(0, 0, 0, 0.06);
             }
             
             .stat-value {
@@ -214,12 +214,12 @@ class GoalinWindow(Adw.ApplicationWindow):
             }
             
             .section-card {
-                background: rgba(255, 255, 255, 0.05);
+                background: white;
                 border-radius: 16px;
                 padding: 24px;
                 margin-bottom: 16px;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             }
             
             .section-title {
@@ -232,7 +232,7 @@ class GoalinWindow(Adw.ApplicationWindow):
                 border-radius: 10px;
                 padding: 12px 16px;
                 margin-bottom: 8px;
-                background: rgba(255, 255, 255, 0.03);
+                background: rgba(0, 0, 0, 0.02);
                 transition: all 200ms;
             }
             
@@ -242,21 +242,21 @@ class GoalinWindow(Adw.ApplicationWindow):
             }
             
             .category-badge {
-                background: rgba(52, 152, 219, 0.25);
+                background: rgba(52, 152, 219, 0.15);
                 border-radius: 12px;
                 padding: 4px 12px;
                 font-size: 11px;
                 font-weight: 600;
-                color: rgba(100, 181, 246, 1);
+                color: rgba(52, 152, 219, 1);
             }
             
             .time-badge {
-                background: rgba(46, 204, 113, 0.25);
+                background: rgba(46, 204, 113, 0.15);
                 border-radius: 12px;
                 padding: 4px 12px;
                 font-size: 12px;
                 font-weight: 600;
-                color: rgba(129, 212, 150, 1);
+                color: rgba(39, 174, 96, 1);
             }
             
             .productivity-high {

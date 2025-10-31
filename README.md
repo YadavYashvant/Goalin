@@ -16,12 +16,38 @@ Goalin is a locally-run productivity tracking service for Linux that monitors yo
 
 ### ✨ Features
 
+- **🎨 Modern Dashboard UI**: Completely redesigned interface with professional aesthetics
+  - Stack-based navigation (Overview, Timeline, Insights, Report)
+  - Custom circular progress bars and activity heatmaps
+  - Color-coded productivity levels and visual indicators
+  - Gradient stat cards with smooth animations
+  - Card-based layout with proper spacing and shadows
+  
+- **📊 Rich Overview Dashboard**
+  - **Circular Progress Stats**: Active time, idle time, app count, and most-used app
+  - **Activity Heatmap**: 24-hour visual representation of activity intensity
+  - **Top Applications**: Your 8 most-used apps with icons, categories, and progress bars
+  - **Category Grid**: Visual breakdown of time spent in each category
+  - **Productivity Score**: At-a-glance percentage of productive time
+  
+- **⏰ Detailed Timeline View**
+  - Hourly breakdown with productivity color coding (green/yellow/red)
+  - Top 3 apps per hour with window titles
+  - Duration and activity count per time block
+  - Visual progress bars for each application
+  
+- **� Insights & Analytics**
+  - **Browser Activity**: Firefox integration with category breakdown
+  - **Top Websites**: Ranked list of most-visited domains
+  - **Productivity Score**: Calculated based on development vs. leisure time
+  - **Time Breakdown**: Development, browser, and communication time analysis
+  
+- **📄 Integrated Report Viewer**
+  - HTML reports display directly in the app
+  - No external browser needed
+  - Beautiful empty states with gradient backgrounds
+  
 - **🔍 Automatic Activity Tracking**: Monitors active windows and applications in real-time
-- **📊 Beautiful GTK4 Interface**: Modern, native Linux application with libadwaita styling
-  - **⏰ Timeline View**: Hourly breakdown of your day with visual progress bars
-  - **📊 Category Analysis**: Time spent in different categories with percentages
-  - **🦊 Firefox Integration**: Detailed browser activity tracking and categorization
-  - **📄 Integrated Reports**: View HTML reports directly in the app without opening a browser
 - **📈 Daily Reports**: Automatically generates detailed reports at the end of each day
 - **📁 Category Classification**: Intelligently categorizes applications (Development, Browser, Communication, etc.)
 - **⏱️ Idle Detection**: Distinguishes between active usage and idle time
