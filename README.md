@@ -18,13 +18,17 @@ Goalin is a locally-run productivity tracking service for Linux that monitors yo
 
 - **🔍 Automatic Activity Tracking**: Monitors active windows and applications in real-time
 - **📊 Beautiful GTK4 Interface**: Modern, native Linux application with libadwaita styling
+  - **⏰ Timeline View**: Hourly breakdown of your day with visual progress bars
+  - **📊 Category Analysis**: Time spent in different categories with percentages
+  - **🦊 Firefox Integration**: Detailed browser activity tracking and categorization
+  - **📄 Integrated Reports**: View HTML reports directly in the app without opening a browser
 - **📈 Daily Reports**: Automatically generates detailed reports at the end of each day
 - **📁 Category Classification**: Intelligently categorizes applications (Development, Browser, Communication, etc.)
 - **⏱️ Idle Detection**: Distinguishes between active usage and idle time
 - **🗄️ Local SQLite Database**: All your data stays on your machine - complete privacy
 - **📄 Multiple Report Formats**: Generate reports in Text, JSON, and HTML formats
 - **🐧 Systemd Integration**: Runs as a background service that starts automatically
-- **🎯 X11 & Wayland Support**: Works with both display servers
+- **🎯 X11 & Wayland Support**: Works with both display servers (including Hyprland)
 
 ## 🚀 Installation
 

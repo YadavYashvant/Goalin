@@ -826,8 +826,11 @@ class GoalinWindow(Adw.ApplicationWindow):
     
     def update_report_display(self):
         """Update the report display with HTML content"""
-        # Generate report file path
-        report_file = REPORT_DIR / f"report_{self.current_date.strftime('%Y-%m-%d')}.html"
+        # Generate report file path with year/month subdirectories
+        year = self.current_date.year
+        month = f"{self.current_date.month:02d}"
+        date_str = self.current_date.strftime('%Y-%m-%d')
+        report_file = REPORT_DIR / str(year) / month / f"report_{date_str}.html"
         
         if report_file.exists():
             # Load the HTML report

@@ -14,8 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Recent window titles for context
   - Time range indicators (HH:00 - HH:59)
   - Empty state with helpful messages
+- **Integrated Report Viewer**: Daily reports now display directly in the GUI (📄 Report tab)
+  - HTML reports rendered inline using WebKit
+  - No need to open external browser
+  - Automatic loading based on selected date
+  - Beautiful gradient empty state for dates without reports
+  - Proper timezone handling (UTC to local time conversion)
 
 ### Planned
+- Manual report generation button in GUI
 - Weekly and monthly report views
 - Productivity goals and targets
 - Notification system
