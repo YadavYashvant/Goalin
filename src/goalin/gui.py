@@ -6,7 +6,8 @@ GTK4 GUI application for Goalin
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Adw, GLib, Gio
+gi.require_version('WebKit', '6.0')
+from gi.repository import Gtk, Adw, GLib, Gio, WebKit
 import sys
 import logging
 from datetime import datetime, timedelta
@@ -15,7 +16,7 @@ from collections import defaultdict
 from pytz import timezone, utc
 
 from goalin.database import ActivityDatabase
-from goalin.config import ensure_directories
+from goalin.config import ensure_directories, REPORT_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -197,6 +198,26 @@ class GoalinWindow(Adw.ApplicationWindow):
         browser_container.append(browser_scrolled)
         notebook.append_page(browser_container, Gtk.Label(label="🦊 Firefox"))
         
+        # Report tab (new)
+        report_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        
+        # Create WebKit WebView for displaying HTML reports
+        self.report_webview = WebKit.WebView()
+        self.report_webview.set_vexpand(True)
+        self.report_webview.set_hexpand(True)
+        
+        # Enable developer extras for debugging (optional)
+        settings = self.report_webview.get_settings()
+        settings.set_enable_developer_extras(False)
+        
+        report_scrolled = Gtk.ScrolledWindow()
+        report_scrolled.set_child(self.report_webview)
+        report_scrolled.set_vexpand(True)
+        report_scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        
+        report_container.append(report_scrolled)
+        notebook.append_page(report_container, Gtk.Label(label="📄 Report"))
+        
         content_box.append(notebook)
         content_clamp.set_child(content_box)
         
@@ -367,6 +388,9 @@ class GoalinWindow(Adw.ApplicationWindow):
         
         # Update browser history list
         self.update_browser_display()
+        
+        # Update report display
+        self.update_report_display()
     
     def update_timeline_display(self):
         """Update the timeline display with hourly activity blocks"""
@@ -799,6 +823,81 @@ class GoalinWindow(Adw.ApplicationWindow):
             box.append(info_box)
             row.set_child(box)
             self.browser_list.append(row)
+    
+    def update_report_display(self):
+        """Update the report display with HTML content"""
+        # Generate report file path
+        report_file = REPORT_DIR / f"report_{self.current_date.strftime('%Y-%m-%d')}.html"
+        
+        if report_file.exists():
+            # Load the HTML report
+            report_uri = report_file.as_uri()
+            self.report_webview.load_uri(report_uri)
+        else:
+            # Show message that report doesn't exist yet
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <style>
+                    body {{
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100vh;
+                        margin: 0;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        text-align: center;
+                        padding: 20px;
+                    }}
+                    .icon {{
+                        font-size: 72px;
+                        margin-bottom: 20px;
+                    }}
+                    h1 {{
+                        font-size: 32px;
+                        font-weight: 600;
+                        margin: 0 0 12px 0;
+                    }}
+                    p {{
+                        font-size: 18px;
+                        opacity: 0.9;
+                        max-width: 500px;
+                        line-height: 1.6;
+                    }}
+                    .date {{
+                        font-weight: 500;
+                        background: rgba(255, 255, 255, 0.2);
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        display: inline-block;
+                        margin-top: 20px;
+                    }}
+                    .info {{
+                        margin-top: 30px;
+                        opacity: 0.8;
+                        font-size: 14px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="icon">📄</div>
+                <h1>Report Not Available</h1>
+                <p>The daily report for this date hasn't been generated yet. Reports are automatically created at midnight for the previous day.</p>
+                <div class="date">{self.current_date.strftime('%B %d, %Y')}</div>
+                <div class="info">
+                    Reports are stored in:<br>
+                    <code style="background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">{REPORT_DIR}</code>
+                </div>
+            </body>
+            </html>
+            """
+            self.report_webview.load_html(html_content, None)
     
     def on_prev_day(self, button):
         """Navigate to previous day"""
