@@ -17,7 +17,7 @@ from pytz import timezone, utc
 import math
 
 from goalin.database import ActivityDatabase
-from goalin.config import ensure_directories, REPORT_DIR
+from goalin.config import ensure_directories, REPORT_DIR, is_setup_complete
 
 logger = logging.getLogger(__name__)
 
@@ -1154,10 +1154,38 @@ class GoalinApplication(Adw.Application):
     
     def do_activate(self):
         """Called when the application is activated"""
+        # Check if setup is complete
+        if not is_setup_complete():
+            self.run_setup_wizard()
+            return
+        
         win = self.props.active_window
         if not win:
             win = GoalinWindow(application=self)
         win.present()
+    
+    def run_setup_wizard(self):
+        """Run the initial setup wizard"""
+        try:
+            from goalin.setup_wizard import SetupWizard
+            wizard = SetupWizard(application=self)
+            wizard.connect('close-request', self.on_setup_complete)
+            wizard.present()
+        except Exception as e:
+            logger.error(f"Failed to run setup wizard: {e}")
+            # Continue with main app even if setup fails
+            self.do_activate()
+    
+    def on_setup_complete(self, wizard):
+        """Called when setup wizard is closed"""
+        if wizard.setup_complete:
+            # Setup was completed, now show main window
+            win = GoalinWindow(application=self)
+            win.present()
+        else:
+            # Setup was cancelled, quit
+            self.quit()
+        return False
     
     def create_action(self, name, callback):
         """Create an application action"""

@@ -15,12 +15,14 @@ setup(
             'goalin-daemon=goalin.daemon:main',
             'goalin-gui=goalin.gui:main',
             'goalin-report=goalin.report:main',
+            'goalin-setup=goalin.setup_wizard:run_setup_wizard',
         ],
     },
     install_requires=[
         'PyGObject>=3.42.0',
         'python-xlib>=0.31',
         'pytz>=2021.3',
+        'google-generativeai>=0.3.0',
     ],
     python_requires='>=3.9',
     classifiers=[

@@ -64,6 +64,7 @@ def ensure_directories():
 def get_category(app_name: str) -> str:
     """
     Determine the category of an application based on its name
+    Uses AI categorization if available, fallback to keyword matching
     
     Args:
         app_name: Name of the application
@@ -71,6 +72,16 @@ def get_category(app_name: str) -> str:
     Returns:
         Category name or 'Other'
     """
+    # Try AI categorization first
+    try:
+        from .ai_assistant import AIAssistant
+        ai = AIAssistant()
+        if ai.is_configured():
+            return ai.get_app_category(app_name)
+    except Exception:
+        pass  # Fallback to keyword matching
+    
+    # Fallback: keyword matching
     app_name_lower = app_name.lower()
     
     for category, keywords in APP_CATEGORIES.items():
@@ -78,3 +89,8 @@ def get_category(app_name: str) -> str:
             return category
     
     return 'Other'
+
+def is_setup_complete() -> bool:
+    """Check if initial setup has been completed"""
+    setup_file = CONFIG_DIR / '.setup_complete'
+    return setup_file.exists()
