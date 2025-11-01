@@ -32,6 +32,11 @@ Setup is optional - the app works fine without AI. If enabled, you'll need your 
 
 <!-- TODO: Add screenshots -->
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3ea5ef56-99e4-445d-9ff3-5ee3655124fa" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6bd715d6-8d19-4f60-bfc0-61a031e7c292" />
+
+
+
 ### ✨ Features
 
 - **🤖 AI-Powered Analysis** (Optional)
