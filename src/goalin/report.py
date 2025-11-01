@@ -202,7 +202,9 @@ class ReportGenerator:
                     'apps': dict(app_durations),
                     'hourly_pattern': dict(hourly_data)
                 }
-                ai_insights = ai.analyze_productivity(day_data)
+                # Pass date_key for caching
+                date_key = date.strftime('%Y-%m-%d')
+                ai_insights = ai.analyze_productivity(day_data, date_key=date_key)
                 # Use AI productivity score if available
                 if ai_insights and 'productivity_score' in ai_insights:
                     productivity_score = ai_insights['productivity_score']

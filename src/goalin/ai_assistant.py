@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 # AI configuration paths
 AI_CONFIG_FILE = CONFIG_DIR / 'ai_config.json'
 APP_CATEGORIES_FILE = DATA_DIR / 'app_categories.json'
+AI_INSIGHTS_CACHE_FILE = DATA_DIR / 'ai_insights_cache.json'
 
 
 class AIAssistant:
@@ -34,10 +35,12 @@ class AIAssistant:
         self.model = None
         self.app_categories: Dict[str, str] = {}
         self.category_definitions: Dict[str, str] = {}
+        self.insights_cache: Dict[str, Dict] = {}
         
         if self.api_key:
             self._initialize_model()
             self._load_app_categories()
+            self._load_insights_cache()
     
     def _load_api_key(self) -> Optional[str]:
         """Load API key from config file"""
@@ -108,6 +111,50 @@ class AIAssistant:
             logger.info(f"Saved {len(self.app_categories)} app categories")
         except Exception as e:
             logger.error(f"Failed to save app categories: {e}")
+    
+    def _load_insights_cache(self):
+        """Load cached AI insights from file"""
+        try:
+            if AI_INSIGHTS_CACHE_FILE.exists():
+                with open(AI_INSIGHTS_CACHE_FILE, 'r') as f:
+                    self.insights_cache = json.load(f)
+                logger.info(f"Loaded {len(self.insights_cache)} cached insights")
+        except Exception as e:
+            logger.error(f"Failed to load insights cache: {e}")
+            self.insights_cache = {}
+    
+    def _save_insights_cache(self):
+        """Save AI insights cache to file"""
+        try:
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            with open(AI_INSIGHTS_CACHE_FILE, 'w') as f:
+                json.dump(self.insights_cache, f, indent=2)
+            logger.info(f"Saved {len(self.insights_cache)} insights to cache")
+        except Exception as e:
+            logger.error(f"Failed to save insights cache: {e}")
+    
+    def get_cached_insights(self, date_key: str) -> Optional[Dict]:
+        """
+        Get cached insights for a specific date
+        
+        Args:
+            date_key: Date in YYYY-MM-DD format
+            
+        Returns:
+            Cached insights dictionary or None
+        """
+        return self.insights_cache.get(date_key)
+    
+    def cache_insights(self, date_key: str, insights: Dict):
+        """
+        Cache insights for a specific date
+        
+        Args:
+            date_key: Date in YYYY-MM-DD format
+            insights: Insights dictionary to cache
+        """
+        self.insights_cache[date_key] = insights
+        self._save_insights_cache()
     
     def detect_installed_apps(self) -> List[str]:
         """
@@ -279,9 +326,9 @@ Respond with ONLY the category name, nothing else."""
         
         return 'Other'
     
-    def analyze_productivity(self, day_data: Dict) -> Dict:
+    def analyze_productivity(self, day_data: Dict, date_key: str = None) -> Dict:
         """
-        Analyze productivity for a day using AI
+        Analyze productivity for a day using AI (with caching)
         
         Args:
             day_data: Dictionary containing:
@@ -289,6 +336,7 @@ Respond with ONLY the category name, nothing else."""
                 - categories: dict of category -> time
                 - apps: dict of app -> time
                 - hourly_pattern: dict of hour -> activity
+            date_key: Date in YYYY-MM-DD format for caching
                 
         Returns:
             Dictionary with:
@@ -297,6 +345,13 @@ Respond with ONLY the category name, nothing else."""
                 - insights: list of insights
                 - recommendations: list of recommendations
         """
+        # Check cache first if date_key provided
+        if date_key:
+            cached = self.get_cached_insights(date_key)
+            if cached:
+                logger.info(f"Using cached insights for {date_key}")
+                return cached
+        
         if not self.model:
             logger.error("AI model not initialized")
             return self._fallback_productivity_analysis(day_data)
@@ -361,6 +416,11 @@ Respond with ONLY a valid JSON object in this format:
             
             analysis = json.loads(result_text)
             logger.info(f"AI productivity analysis completed: {analysis['productivity_score']}%")
+            
+            # Cache the result if date_key provided
+            if date_key:
+                self.cache_insights(date_key, analysis)
+            
             return analysis
             
         except Exception as e:
