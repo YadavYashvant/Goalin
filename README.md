@@ -12,67 +12,71 @@
 
 ## 📖 Overview
 
-Goalin is a locally-run productivity tracking service for Linux that monitors your application usage and generates comprehensive daily reports. It helps you understand how you spend your time on your computer, identify productivity patterns, and make data-driven decisions to improve your workflow.
+Goalin is a productivity tracking service for Linux that monitors your application usage and generates daily reports. Track how you spend your time, identify patterns, and make informed decisions about your workflow.
 
-**NEW: Now with AI-powered insights!** Goalin integrates with Google Gemini to provide intelligent productivity analysis, smart app categorization, and personalized recommendations—all while keeping your data local and private.
+Now includes optional AI-powered insights using Google Gemini for smart categorization and productivity analysis.
 
 ## 🤖 AI Features
 
-Goalin leverages Google's Gemini AI to supercharge your productivity tracking:
+Optional AI integration using Google Gemini:
 
-- **🎯 Smart App Categorization**: Automatically categorizes all installed applications into meaningful groups (Development, Communication, Entertainment, etc.)
-- **📊 AI Productivity Scoring**: Advanced analysis that goes beyond simple time tracking, considering context and work patterns
-- **💡 Intelligent Insights**: Daily observations about your productivity patterns, focus time, and work habits
-- **🚀 Personalized Recommendations**: Actionable suggestions tailored to your specific usage patterns
-- **⚡ Performance Optimized**: 
-  - Async loading keeps UI responsive
-  - Multi-tier caching (config → app categories → daily insights)
-  - Batch processing reduces API calls
-  - Loading indicators for smooth UX
-- **🔒 Privacy First**: Your API key, your data, your control
+- **Smart Categorization**: Automatically categorizes installed applications
+- **Productivity Analysis**: Context-aware scoring beyond simple time tracking
+- **Daily Insights**: Observations about your work patterns and focus time
+- **Recommendations**: Personalized suggestions to improve productivity
+- **Fast & Responsive**: Async loading with caching prevents UI freezing
 
-### How It Works
-
-1. **Setup**: Run the setup wizard to configure your Google Gemini API key (free tier available)
-2. **Categorization**: AI scans and categorizes your installed applications (one-time process)
-3. **Daily Analysis**: As you work, Goalin tracks your activity and generates AI insights at day's end
-4. **Smart Caching**: Insights are cached per day—instant loading when revisiting previous days
-5. **View & Learn**: Beautiful dashboard shows your productivity score, key insights, and recommendations
+Setup is optional - the app works fine without AI. If enabled, you'll need your own (free) Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
 
 ## 📸 Screenshots
 
-<!-- TODO: Add screenshots here -->
-- Dashboard with AI productivity score
-- Timeline view with categorized apps
-- Insights page with AI recommendations
-- HTML report with AI analysis
+<!-- TODO: Add screenshots -->
 
 ### ✨ Features
 
-- **🤖 AI-Powered Productivity Analysis**: Intelligent insights using Google Gemini
-  - **Smart App Categorization**: AI automatically categorizes installed applications
-  - **Productivity Scoring**: Advanced AI analysis of daily productivity patterns
-  - **Personalized Insights**: AI-generated observations about your work habits
-  - **Actionable Recommendations**: AI suggests improvements to boost productivity
-  - **Performance Optimized**: Async loading with caching for smooth, responsive UI
-  - **Privacy First**: Your own API key, all data stays local
+- **🤖 AI-Powered Analysis** (Optional)
+  - Smart app categorization
+  - Productivity scoring with insights
+  - Personalized recommendations
+  - Async loading with caching
   
-- **🎨 Modern Dashboard UI**: Completely redesigned interface with professional aesthetics
-  - Stack-based navigation (Overview, Timeline, Insights, Report)
-  - Custom circular progress bars and activity heatmaps
-  - Color-coded productivity levels and visual indicators
-  - Gradient stat cards with smooth animations
-  - Card-based layout with proper spacing and shadows
-  - Loading spinners for async operations
+- **🎨 Modern UI**
+  - Stack-based navigation
+  - Circular progress indicators
+  - Activity heatmaps
+  - Card-based layout
   
-- **📊 Rich Overview Dashboard**
-  - **AI Productivity Score**: ML-powered analysis with contextual insights
-  - **Circular Progress Stats**: Active time, idle time, app count, and most-used app
-  - **Activity Heatmap**: 24-hour visual representation of activity intensity
-  - **Top Applications**: Your 8 most-used apps with icons, AI categories, and progress bars
-  - **Category Grid**: Visual breakdown of time spent in each category
-  - **Key Insights**: AI-generated observations displayed prominently
-  - **Smart Recommendations**: Actionable tips to improve productivity
+- **📊 Dashboard**
+  - Circular progress stats
+  - 24-hour activity heatmap
+  - Top 8 applications with categories
+  - Time breakdown by category
+  
+- **⏰ Timeline View**
+  - Hourly breakdown with color coding
+  - Top apps per hour
+  - Window titles and durations
+  
+- **🔍 Insights & Analytics**
+  - Browser activity (Firefox)
+  - Top websites visited
+  - Productivity scoring
+  
+- **Core Features**
+  - Automatic activity tracking
+  - Daily reports (text, JSON, HTML)
+  - Idle time detection
+  - Local SQLite database
+  - Systemd integration
+  - X11 & Wayland support
+
+## 🚀 Installation
+
+### From AUR (Arch Linux)
+
+Coming soon to AUR!
+
+## 🚀 Installation
   
 - **⏰ Detailed Timeline View**
   - Hourly breakdown with productivity color coding (green/yellow/red)
@@ -104,20 +108,9 @@ Goalin leverages Google's Gemini AI to supercharge your productivity tracking:
 
 ## 🚀 Installation
 
-### From AUR (Arch Linux) (Yet to be published!)
+### From AUR (Arch Linux)
 
-```bash
-# Using yay
-yay -S goalin
-
-# Using paru
-paru -S goalin
-
-# Manual installation with makepkg
-git clone https://aur.archlinux.org/goalin.git
-cd goalin
-makepkg -si
-```
+Coming soon to AUR!
 
 ### From Source
 
@@ -160,18 +153,12 @@ goalin-gui
 ## 📋 Dependencies
 
 - Python 3.9+
-- PyGObject (python-gobject)
-- GTK4
-- libadwaita
-- python-xlib (for X11 support)
+- PyGObject, GTK4, libadwaita
+- python-xlib (for X11)
 - pytz
-- google-generativeai (for AI features)
+- google-generativeai (optional, for AI features)
 
-### AI Features (Optional)
-
-To use AI-powered productivity analysis, you'll need:
-- A Google Gemini API key (free tier available at [Google AI Studio](https://makersuite.google.com/app/apikey))
-- The app will guide you through setup on first launch with the setup wizard
+Get a free API key at [Google AI Studio](https://makersuite.google.com/app/apikey) to enable AI features.
 
 ## 🎮 Usage
 
@@ -192,28 +179,11 @@ journalctl --user -u goalin.service -f
 ### Opening the GUI
 
 ```bash
-# Launch from terminal
 goalin-gui
-
 # Or find "Goalin" in your application launcher
-
-# First launch: Setup wizard will guide you through AI configuration
-# - Enter your Google Gemini API key (optional but recommended)
-# - AI will categorize your installed applications
-# - Start tracking with intelligent insights!
 ```
 
-### Configuring AI Features
-
-```bash
-# Run the setup wizard anytime
-goalin-setup
-
-# The wizard will:
-# 1. Prompt for your Google Gemini API key
-# 2. Scan and categorize installed applications
-# 3. Configure AI-powered productivity analysis
-```
+On first launch, the setup wizard will help you configure AI features (optional).
 
 ### Generating Reports Manually
 
@@ -245,50 +215,15 @@ goalin-report --format all
 
 ## ⚙️ Configuration
 
-Configuration can be customized by editing `src/goalin/config.py`:
+Edit `src/goalin/config.py` to customize:
 
 ```python
-# Tracking settings
 POLL_INTERVAL = 5  # seconds between activity checks
-IDLE_THRESHOLD = 300  # seconds before considering user idle
-
-# Report settings
-REPORT_TIME = "20:00"  # Time to generate daily report (24-hour format)
+IDLE_THRESHOLD = 300  # seconds before considering idle
+REPORT_TIME = "20:00"  # daily report generation time
 ```
 
-### AI Configuration
-
-AI features are configured through the setup wizard or `~/.config/goalin/ai_config.json`:
-
-```json
-{
-  "api_key": "your-gemini-api-key",
-  "model": "gemini-2.0-flash",
-  "enabled": true
-}
-```
-
-**Getting an API Key:**
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Create a new API key (free tier available)
-4. Run `goalin-setup` and paste your key
-
-**Privacy Note:** Your API key is stored locally and only used for AI analysis. All data remains on your machine.
-
-### Application Categories
-
-Application categories are now intelligently managed by AI, but you can still customize them in `config.py`:
-
-```python
-APP_CATEGORIES = {
-    'Development': ['code', 'vscode', 'vim', 'pycharm', ...],
-    'Browser': ['firefox', 'chrome', 'brave', ...],
-    'Communication': ['slack', 'discord', 'telegram', ...],
-    # Add your own categories...
-    # AI will learn and categorize new apps automatically
-}
-```
+For AI features, run `goalin-setup` or edit `~/.config/goalin/ai_config.json`.
 
 ## 📊 Report Examples
 
@@ -314,44 +249,20 @@ Communication................. 0h 38m (11.8%)
 ```
 
 ### HTML Report
-Beautiful, responsive HTML reports with charts, visualizations, and AI-powered insights including:
-- AI Productivity Score with detailed breakdown
-- Key insights about your work patterns
-- Personalized recommendations for improvement
-- Smart categorization of applications
+Beautiful responsive reports with charts and visualizations. Includes AI insights when enabled.
 
 ### JSON Report
-Machine-readable format for integration with other tools and services, including AI analysis data.
+Machine-readable format for integrations.
 
 ## 🔒 Privacy
 
-Goalin takes your privacy seriously:
+All data stays on your machine:
+- Local SQLite database
+- No telemetry or tracking
+- Open source - audit the code
+- Your control over data
 
-- ✅ **100% Local**: All data is stored locally on your machine
-- ✅ **No Cloud Storage**: Database and reports never leave your computer
-- ✅ **Your Own API Key**: AI features use your personal Google Gemini key
-- ✅ **Minimal API Calls**: Smart caching reduces API usage (one call per day analyzed)
-- ✅ **No Tracking**: We don't track your usage or collect analytics
-- ✅ **Open Source**: Full transparency - audit the code yourself
-- ✅ **Your Control**: Delete or export your data anytime
-- ✅ **Secure Storage**: API keys stored locally in config files
-
-**AI Privacy:** When AI features are enabled, only anonymized usage statistics (time spent, categories, app names) are sent to Google Gemini for analysis. No personal information, file contents, or sensitive data is transmitted.
-
-## ⚡ Performance
-
-Goalin is designed to be lightweight and responsive:
-
-- **Minimal Resource Usage**: Background daemon uses < 50MB RAM
-- **Efficient Tracking**: Polling-based system with configurable intervals (default: 5s)
-- **Smart Caching**: Three-tier cache system prevents redundant API calls
-  - Configuration cache (persistent)
-  - App categorization cache (on-demand)
-  - Daily insights cache (24-hour validity)
-- **Async UI**: AI analysis runs in background threads—UI never freezes
-- **Loading Indicators**: Smooth spinners and progress feedback
-- **Optimized Database**: Indexed SQLite database for fast queries
-- **Batch Processing**: AI processes multiple apps per API call (20 at a time)
+When AI is enabled, only anonymized usage stats (time spent, categories, app names) are sent to Google Gemini. Your API key is stored locally.
 
 ## 🛠️ Development
 
@@ -398,57 +309,33 @@ makepkg -si
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions welcome! Open an issue or submit a pull request.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 🐛 Known Issues
 
-## 🐛 Known Issues & Limitations
-
-- **Wayland Support**: Window tracking on Wayland is limited due to security restrictions. Works best on Sway compositor.
-- **Idle Detection**: Wayland idle detection is basic and may not be as accurate as X11.
-- **Window Titles**: Some applications may not expose window titles properly.
-- **AI Rate Limits**: Free tier of Google Gemini has rate limits (check [Google AI Studio](https://makersuite.google.com/app/apikey) for details)
-- **First AI Analysis**: First-time categorization of many apps may take a few minutes
+- Limited Wayland support (works best on Sway)
+- Some apps may not expose window titles
+- AI rate limits on free tier (see Google AI Studio for details)
 
 ## 📝 TODO
 
-- [x] Add AI-powered productivity analysis
-- [x] Implement smart application categorization
-- [x] Add insights and recommendations
-- [x] Optimize performance with caching
-- [ ] Add support for more Wayland compositors
-- [ ] Implement weekly and monthly report views with AI summaries
-- [ ] Add productivity goals and AI-powered tracking
-- [ ] Create notification system for productivity reminders
-- [ ] Add data export/import functionality
-- [ ] Implement application blocklist/allowlist with AI suggestions
-- [ ] Add statistics and trend analysis with ML predictions
-- [ ] Create a configuration GUI
-- [ ] Add support for other AI providers (OpenAI, Claude, etc.)
+- [x] AI-powered productivity analysis
+- [x] Smart application categorization
+- [x] Performance optimization with caching
+- [ ] Weekly and monthly reports
+- [ ] Productivity goals
+- [ ] Data export/import
+- [ ] Configuration GUI
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## 👤 Author
 
-**YadavYashvant**
-
-- GitHub: [@YadavYashvant](https://github.com/YadavYashvant)
-- Repository: [Goalin](https://github.com/YadavYashvant/Goalin)
-
-## 🙏 Acknowledgments
-
-- GTK and GNOME teams for the amazing toolkit
-- Python community for excellent libraries
-- Arch Linux community for the AUR
+**YadavYashvant**  
+GitHub: [@YadavYashvant](https://github.com/YadavYashvant)
 
 ---
 
-<div align="center">
 Made with ❤️ for the Linux community
-</div>
