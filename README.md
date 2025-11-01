@@ -58,7 +58,7 @@ Goalin is a locally-run productivity tracking service for Linux that monitors yo
 
 ## 🚀 Installation
 
-### From AUR (Arch Linux)
+### From AUR (Arch Linux) (Yet to be published!)
 
 ```bash
 # Using yay
