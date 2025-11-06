@@ -78,10 +78,10 @@ Setup is optional - the app works fine without AI. If enabled, you'll need your 
 ## 🚀 Installation
 
 ### From AUR (Arch Linux)
-
-Coming soon to AUR!
-
 ## 🚀 Installation
+```bash
+yay -S goalin
+```
   
 - **⏰ Detailed Timeline View**
   - Hourly breakdown with productivity color coding (green/yellow/red)
