@@ -74,14 +74,6 @@ Setup is optional - the app works fine without AI. If enabled, you'll need your 
   - Local SQLite database
   - Systemd integration
   - X11 & Wayland support
-
-## 🚀 Installation
-
-### From AUR (Arch Linux)
-## 🚀 Installation
-```bash
-yay -S goalin
-```
   
 - **⏰ Detailed Timeline View**
   - Hourly breakdown with productivity color coding (green/yellow/red)
@@ -115,7 +107,11 @@ yay -S goalin
 
 ### From AUR (Arch Linux)
 
-Coming soon to AUR!
+```bash
+
+yay -S goalin
+
+```
 
 ### From Source
 
