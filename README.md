@@ -290,24 +290,6 @@ Goalin/
 └── README.md           # This file
 ```
 
-### Building for AUR
-
-```bash
-# Update version in setup.py, PKGBUILD, and src/goalin/__init__.py
-# Create a git tag
-git tag -a v0.1.0 -m "Release version 0.1.0"
-git push origin v0.1.0
-
-# Generate checksums
-makepkg --geninteg
-
-# Update PKGBUILD with new checksums
-# Test the build
-makepkg -si
-
-# Submit to AUR
-```
-
 ## 🤝 Contributing
 
 Contributions welcome! Open an issue or submit a pull request.
